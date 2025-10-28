@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="{{ shop.locale }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  
+  <!-- Shopify Required Tags -->
+  {{ content_for_header }}
+  
+  <title>Dynamic Excel - Professional Services</title>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* ===== GLOBAL STYLES ===== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Arial', sans-serif;
+    }
+
+    :root {
+        --primary: #2c3e50;
+        --secondary: #ff7b00;
+        --accent: #ff9e40;
+        --light: #fef5ec;
+        --dark: #2c3e50;
+        --text: #333333;
+        --text-light: #7f8c8d;
+        --white: #ffffff;
+        --success: #28a745;
+    }
+
+    body {
+        background-color: var(--light);
+        color: var(--text);
+        line-height: 1.6;
+        font-size: 16px;
+        overflow-x: hidden;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    /* ===== LOADING ANIMATION ===== */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--primary);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .loading-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .loading-content {
+        text-align: center;
+        color: var(--white);
+    }
+
+    .loading-logo {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, var(--secondary), var(--accent));
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-weight: bold;
+        font-size: 30px;
+        margin: 0 auto 30px;
+        animation: pulse 2s infinite;
+    }
+
+    .loading-text {
+        font-size: 24px;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .loading-bar {
+        width: 300px;
+        height: 6px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    .loading-progress {
+        height: 100%;
+        width: 0%;
+        background-color: var(--secondary);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    .loading-services {
+        margin-top: 30px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        max-width: 600px;
+    }
+
+    .service-tag {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s ease;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes bounceIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        70% {
+            transform: scale(0.9);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .animate-fadeInUp {
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .animate-fadeInLeft {
+        animation: fadeInLeft 1s ease-out;
+    }
+
+    .animate-fadeInRight {
+        animation: fadeInRight 1s ease-out;
+    }
+
+    .animate-pulse {
+        animation: pulse 2s infinite;
+    }
+
+    .animate-bounceIn {
+        animation: bounceIn 1s ease-out;
+    }
+
+    .animate-rotate {
+        animation: rotate 2s linear infinite;
+    }
+
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .hidden {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.8s ease-out;
+    }
+
+    .visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+        display: inline-block;
+        background-color: var(--secondary);
+        color: var(--white);
+        padding: 12px 25px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: #e66a00;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid var(--white);
+        color: var(--white);
+    }
+
+    .btn-outline:hover {
+        background: var(--white);
+        color: var(--primary);
+    }
+
+    .btn-secondary {
+        background-color: var(--primary);
+    }
+
+    .btn-secondary:hover {
+        background-color: #1a252f;
+    }
+
+    /* ===== HEADER STYLES ===== */
+    .dynamic-header {
+        background-color: var(--white);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        padding: 15px 0;
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+    }
+
+    .logo-img {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--secondary), var(--accent));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-weight: bold;
+        font-size: 20px;
+        margin-right: 10px;
+        animation: pulse 3s infinite;
+    }
+
+    .logo-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .logo-main {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary);
+        line-height: 1;
+    }
+
+    .logo-sub {
+        font-size: 12px;
+        color: var(--secondary);
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .nav-links {
+        display: flex;
+        list-style: none;
+    }
+
+    .nav-links li {
+        margin-left: 25px;
+    }
+
+    .nav-links a {
+        text-decoration: none;
+        color: var(--primary);
+        font-weight: 500;
+        position: relative;
+        padding: 5px 0;
+        transition: color 0.3s ease;
+    }
+
+    .nav-links a::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--secondary);
+        transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+        width: 100%;
+    }
+
+    .nav-links a:hover {
+        color: var(--secondary);
+    }
+
+    .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: var(--primary);
+        cursor: pointer;
+    }
+
+    /* ===== HERO SECTION ===== */
+    .dynamic-hero {
+        background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.9)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: var(--white);
+        padding: 180px 0 120px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+
+    .dynamic-hero h1 {
+        color: var(--white);
+        margin-bottom: 20px;
+        font-size: 48px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        animation: fadeInUp 1.5s ease-out;
+    }
+
+    .dynamic-hero p {
+        color: var(--white);
+        font-size: 20px;
+        margin-bottom: 30px;
+        opacity: 0.9;
+        animation: fadeInUp 1.5s ease-out 0.3s both;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 1.5s ease-out 0.6s both;
+    }
+
+    .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .floating-element {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-element:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .floating-element:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        top: 60%;
+        left: 80%;
+        animation-delay: 2s;
+    }
+
+    .floating-element:nth-child(3) {
+        width: 40px;
+        height: 40px;
+        top: 80%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+
+    /* ===== SERVICES SECTION ===== */
+    .dynamic-services {
+        background-color: var(--light);
+        padding: 100px 0;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 70px;
+    }
+
+    .section-title h2 {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 15px;
+        font-size: 36px;
+        color: var(--primary);
+    }
+
+    .section-title h2::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -10px;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: var(--secondary);
+    }
+
+    .section-title p {
+        color: var(--text-light);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 40px;
+    }
+
+    .service-card {
+        background-color: var(--white);
+        border-radius: 12px;
+        padding: 40px 30px;
+        text-align: center;
+        transition: all 0.5s ease;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border-top: 5px solid var(--secondary);
+        position: relative;
+        overflow: hidden;
+        transform-style: preserve-3d;
+        perspective: 1000px;
+    }
+
+    .service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.7s;
+    }
+
+    .service-card:hover::before {
+        left: 100%;
+    }
+
+    .service-card:hover {
+        transform: translateY(-15px) rotateY(5deg);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .service-icon {
+        font-size: 60px;
+        color: var(--secondary);
+        margin-bottom: 25px;
+        display: inline-block;
+        transition: all 0.5s ease;
+    }
+
+    .service-card:hover .service-icon {
+        transform: scale(1.2) rotate(10deg);
+        color: var(--accent);
+    }
+
+    .service-card h3 {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: var(--primary);
+        transition: color 0.3s ease;
+    }
+
+    .service-card:hover h3 {
+        color: var(--secondary);
+    }
+
+    .service-card p {
+        color: var(--text-light);
+        margin-bottom: 25px;
+        line-height: 1.7;
+    }
+
+    .service-features {
+        list-style: none;
+        margin-bottom: 25px;
+        text-align: left;
+    }
+
+    .service-features li {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        padding: 5px 0;
+        transition: all 0.3s ease;
+    }
+
+    .service-features li:hover {
+        transform: translateX(5px);
+    }
+
+    .service-features li i {
+        color: var(--secondary);
+        margin-right: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .service-features li:hover i {
+        color: var(--accent);
+        transform: scale(1.2);
+    }
+
+    .service-price {
+        font-weight: 700;
+        color: var(--secondary);
+        margin-bottom: 20px;
+        font-size: 22px;
+        transition: all 0.3s ease;
+    }
+
+    .service-card:hover .service-price {
+        transform: scale(1.1);
+    }
+
+    .service-badge {
+        position: absolute;
+        top: 20px;
+        right: -30px;
+        background: var(--secondary);
+        color: white;
+        padding: 5px 30px;
+        font-size: 14px;
+        transform: rotate(45deg);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* ===== FEEDBACK SECTION ===== */
+    .dynamic-feedback {
+        background-color: var(--white);
+        padding: 100px 0;
+    }
+
+    .feedback-slider {
+        max-width: 1000px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feedback-track {
+        display: flex;
+        transition: transform 0.5s ease;
+    }
+
+    .feedback-slide {
+        min-width: 100%;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+
+    .feedback-card {
+        background-color: var(--light);
+        border-radius: 12px;
+        padding: 40px 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border-left: 5px solid var(--secondary);
+        position: relative;
+    }
+
+    .customer-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        overflow: hidden;
+        border: 3px solid var(--secondary);
+    }
+
+    .customer-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .customer-name {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: var(--primary);
+    }
+
+    .customer-location {
+        color: var(--text-light);
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .customer-feedback {
+        font-style: italic;
+        line-height: 1.7;
+        margin-bottom: 20px;
+        color: var(--text);
+    }
+
+    .rating {
+        color: #ffc107;
+        margin-bottom: 15px;
+    }
+
+    .feedback-nav {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .feedback-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #ddd;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .feedback-dot.active {
+        background-color: var(--secondary);
+        transform: scale(1.2);
+    }
+
+    .feedback-nav-btn {
+        background-color: var(--secondary);
+        color: var(--white);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .feedback-nav-btn:hover {
+        background-color: #e66a00;
+    }
+
+    .feedback-prev {
+        left: 0;
+    }
+
+    .feedback-next {
+        right: 0;
+    }
+
+    /* ===== BOOKING SECTION ===== */
+    .dynamic-booking {
+        background-color: var(--light);
+        padding: 80px 0;
+    }
+
+    .booking-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+
+    .booking-form-container, .booking-summary {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid #eee;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--primary);
+        font-weight: 500;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(255, 158, 64, 0.2);
+    }
+
+    .form-row {
+        display: flex;
+        gap: 15px;
+    }
+
+    .form-row .form-group {
+        flex: 1;
+    }
+
+    .service-selection {
+        background: var(--light);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .selected-service {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .service-details h4 {
+        margin-bottom: 5px;
+    }
+
+    .service-details p {
+        color: var(--text-light);
+        font-size: 14px;
+    }
+
+    .change-service {
+        color: var(--secondary);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .urgent-request {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .urgent-request input {
+        margin-right: 10px;
+    }
+
+    .summary-details {
+        margin-bottom: 30px;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 18px;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 2px solid #eee;
+    }
+
+    .payment-options {
+        margin-top: 20px;
+    }
+
+    .payment-method {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .payment-method:hover {
+        border-color: var(--accent);
+    }
+
+    .payment-method.selected {
+        border-color: var(--secondary);
+        background: rgba(255, 123, 0, 0.05);
+    }
+
+    .payment-method input {
+        margin-right: 10px;
+    }
+
+    .payment-icon {
+        margin-right: 10px;
+        font-size: 20px;
+        color: var(--primary);
+    }
+
+    /* ===== FOOTER STYLES ===== */
+    .dynamic-footer {
+        background-color: var(--primary);
+        color: var(--white);
+        padding: 80px 0 30px;
+    }
+
+    .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+        margin-bottom: 40px;
+    }
+
+    .footer-column h3 {
+        font-size: 20px;
+        margin-bottom: 25px;
+        position: relative;
+        padding-bottom: 10px;
+        color: var(--white);
+    }
+
+    .footer-column h3::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 40px;
+        height: 2px;
+        background-color: var(--secondary);
+    }
+
+    .footer-column p {
+        color: #bdc3c7;
+        line-height: 1.7;
+    }
+
+    .footer-column ul {
+        list-style: none;
+    }
+
+    .footer-column ul li {
+        margin-bottom: 12px;
+    }
+
+    .footer-column ul li a {
+        color: #bdc3c7;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .footer-column ul li a:hover {
+        color: var(--secondary);
+        transform: translateX(5px);
+    }
+
+    .contact-info li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .contact-info li i {
+        margin-right: 15px;
+        color: var(--secondary);
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .emergency-widget {
+        background: rgba(255, 123, 0, 0.1);
+        padding: 25px;
+        border-radius: 10px;
+        text-align: center;
+        margin-top: 20px;
+        border: 1px solid rgba(255, 123, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .emergency-widget:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .emergency-icon {
+        font-size: 30px;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .emergency-text {
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+
+    .copyright {
+        text-align: center;
+        padding-top: 30px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: #bdc3c7;
+        font-size: 14px;
+    }
+
+    /* ===== PROGRESS INDICATOR ===== */
+    .progress-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 1001;
+    }
+
+    .progress-bar {
+        height: 5px;
+        background: var(--secondary);
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    /* ===== CHAT BOT ===== */
+    .chat-bot {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background: var(--secondary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    .chat-bot:hover {
+        transform: scale(1.1);
+    }
+
+    .chat-window {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 350px;
+        height: 450px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .chat-header {
+        background: var(--primary);
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chat-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .chat-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .message {
+        padding: 10px 15px;
+        border-radius: 18px;
+        max-width: 80%;
+        font-size: 14px;
+    }
+
+    .bot-message {
+        background: #f1f1f1;
+        align-self: flex-start;
+    }
+
+    .user-message {
+        background: var(--secondary);
+        color: white;
+        align-self: flex-end;
+    }
+
+    .chat-input {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #eee;
+    }
+
+    .chat-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+    }
+
+    .chat-input button {
+        background: var(--secondary);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-left: 10px;
+        cursor: pointer;
+    }
+
+    /* ===== BACK TO TOP BUTTON ===== */
+    .back-to-top {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 999;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .back-to-top.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .back-to-top:hover {
+        background: #1a252f;
+        transform: translateY(-3px);
+    }
+
+    /* ===== RESPONSIVE STYLES ===== */
+    @media (max-width: 992px) {
+        .hero h1 {
+            font-size: 42px;
+        }
+        
+        .services-grid {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        .feedback-nav-btn {
+            position: static;
+            transform: none;
+            margin-top: 20px;
+        }
+
+        .booking-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .navbar {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .nav-links {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .nav-links li {
+            margin-left: 0;
+        }
+        
+        .dynamic-hero {
+            padding: 150px 0 100px;
+        }
+        
+        .dynamic-hero h1 {
+            font-size: 36px;
+        }
+        
+        .hero-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .form-row {
+            flex-direction: column;
+        }
+        
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .footer-content {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        .loading-services {
+            max-width: 100%;
+            padding: 0 20px;
+        }
+
+        .mobile-menu-btn {
+            display: block;
+        }
+
+        .nav-links {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .nav-links.active {
+            display: flex;
+        }
+
+        .nav-links li {
+            margin: 10px 0;
+        }
+
+        .chat-window {
+            width: 300px;
+            height: 400px;
+            right: 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dynamic-hero h1 {
+            font-size: 32px;
+        }
+        
+        .section-title h2 {
+            font-size: 28px;
+        }
+        
+        .service-card, .booking-form-container, .booking-summary {
+            padding: 30px 20px;
+        }
+        
+        .loading-text {
+            font-size: 20px;
+        }
+        
+        .loading-bar {
+            width: 250px;
+        }
+
+        .chat-window {
+            width: calc(100% - 40px);
+            right: 20px;
+            left: 20px;
+        }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Loading Animation -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <div class="loading-logo">DE</div>
+      <div class="loading-text">Dynamic Excel Services</div>
+      <div class="loading-bar">
+        <div class="loading-progress" id="loadingProgress"></div>
+      </div>
+      <div class="loading-services" id="loadingServices">
+        <!-- Service tags will be added by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Shopify Default Content -->
+  {% section 'header' %}
+  
+  <main class="main-content">
+    {{ content_for_layout }}
+  </main>
+  
+  {% section 'footer' %}
+
+  <!-- Dynamic Excel Website Code -->
+  <div id="dynamic-excel-website">
+    <!-- Header -->
+    <header class="dynamic-header">
+      <div class="container">
+        <nav class="navbar">
+          <a href="#" class="logo">
+            <div class="logo-img">DE</div>
+            <div class="logo-text">
+              <div class="logo-main">DYNAMIC EXCEL</div>
+              <div class="logo-sub">CONTINUOUS ENERGETIC VERSATILE</div>
+            </div>
+          </a>
+
+          <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <ul class="nav-links" id="navLinks">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#feedback">Feedback</a></li>
+            <li><a href="#booking">Book Now</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+
+          <a href="tel:03285000617" class="btn">Call Now</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="dynamic-hero">
+      <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+      </div>
+      <div class="container">
+        <div class="hero-content">
+          <h1>Your Trusted Partner for All Services</h1>
+          <p>Dynamic Excel provides professional plumbing, electrical, construction, telecommunications, WAPDA work and many other services with quality and reliability.</p>
+          <div class="hero-buttons">
+            <a href="#services" class="btn">Our Services</a>
+            <a href="tel:03285000617" class="btn btn-outline">Call Now</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="dynamic-services">
+      <div class="container">
+        <div class="section-title hidden">
+          <h2>Our Professional Services</h2>
+          <p>We offer a wide range of professional services to meet all your needs</p>
+        </div>
+
+        <div class="services-grid">
+          <!-- Plumbing Service -->
+          <div class="service-card hidden">
+            <div class="service-badge">Popular</div>
+            <div class="service-icon"><i class="fas fa-faucet"></i></div>
+            <h3>Plumbing Services</h3>
+            <p>Professional plumbing services for residential and commercial properties with guaranteed quality and reliability.</p>
+            <ul class="service-features">
+              <li><i class="fas fa-check"></i> Leak detection & repair</li>
+              <li><i class="fas fa-check"></i> Pipe installation & replacement</li>
+              <li><i class="fas fa-check"></i> Drain cleaning & unclogging</li>
+              <li><i class="fas fa-check"></i> Water heater installation</li>
+              <li><i class="fas fa-check"></i> Bathroom & kitchen plumbing</li>
+            </ul>
+            <div class="service-price">Starting from PKR 1,500</div>
+            <a href="tel:03285000617" class="btn">Book Now</a>
+          </div>
+
+          <!-- Electrical Service -->
+          <div class="service-card hidden">
+            <div class="service-badge">Popular</div>
+            <div class="service-icon"><i class="fas fa-bolt"></i></div>
+            <h3>Electrical Services</h3>
+            <p>Complete electrical solutions including installation, repair, and maintenance by certified electricians.</p>
+            <ul class="service-features">
+              <li><i class="fas fa-check"></i> Wiring installation & upgrades</li>
+              <li><i class="fas fa-check"></i> Electrical panel upgrades</li>
+              <li><i class="fas fa-check"></i> Lighting installation</li>
+              <li><i class="fas fa-check"></i> Electrical troubleshooting</li>
+              <li><i class="fas fa-check"></i> Safety inspections</li>
+            </ul>
+            <div class="service-price">Starting from PKR 2,000</div>
+            <a href="tel:03285000617" class="btn">Book Now</a>
+          </div>
+
+          <!-- Construction Service -->
+          <div class="service-card hidden">
+            <div class="service-icon"><i class="fas fa-home"></i></div>
+            <h3>House Construction</h3>
+            <p>End-to-end construction services from planning to execution with quality materials and skilled workforce.</p>
+            <ul class="service-features">
+              <li><i class="fas fa-check"></i> Architectural design</li>
+              <li><i class="fas fa-check"></i> Foundation work</li>
+              <li><i class="fas fa-check"></i> Structural construction</li>
+              <li><i class="fas fa-check"></i> Project management</li>
+              <li><i class="fas fa-check"></i> Quality assurance</li>
+            </ul>
+            <div class="service-price">Custom Quote</div>
+            <a href="tel:03285000617" class="btn">Book Now</a>
+          </div>
+
+          <!-- Painting Service -->
+          <div class="service-card hidden">
+            <div class="service-icon"><i class="fas fa-paint-roller"></i></div>
+            <h3>Painting Services</h3>
+            <p>Interior and exterior painting services with quality materials and professional finishing.</p>
+            <ul class="service-features">
+              <li><i class="fas fa-check"></i> Interior painting</li>
+              <li><i class="fas fa-check"></i> Exterior painting</li>
+              <li><i class="fas fa-check"></i> Wallpaper installation</li>
+              <li><i class="fas fa-check"></i> Surface preparation</li>
+              <li><i class="fas fa-check"></i> Color consultation</li>
+            </ul>
+            <div class="service-price">Starting from PKR 3,000</div>
+            <a href="tel:03285000617" class="btn">Book Now</a>
+          </div>
+
+          <!-- Carpentry Service -->
+          <div class="service-card hidden">
+            <div class="service-icon"><i class="fas fa-hammer"></i></div>
+            <h3>Carpentry Services</h3>
+            <p>Custom woodwork and furniture solutions for your space with precision and craftsmanship.</p>
+            <ul class="service-features">
+              <li><i class="fas fa-check"></i> Custom furniture</li>
+              <li><i class="fas fa-check"></i> Cabinet installation</li>
+              <li><i class="fas fa-check"></i> Door & window framing</li>
+              <li><i class="fas fa-check"></i> Trim work</li>
+              <li><i class="fas fa-check"></i> Wood repairs</li>
+            </ul>
+            <div class="service-price">Starting from PKR 2,500</div>
+            <a href="tel:03285000617" class="btn">Book Now</a>
+          </div>
+
+          <!-- Maintenance Service -->
+          <div class="service-card hidden">
+            <div class="service-icon"><i class="fas fa-tools"></i></div>
+            <h3>Maintenance Services</h3>
+            <p>Regular maintenance services to keep your property in perfect condition all year round.</p>
+            <ul class="service-features">
+              <li><i class="fas fa-check"></i> Preventive maintenance</li>
+              <li><i class="fas fa-check"></i> HVAC servicing</li>
+              <li><i class="fas fa-check"></i> Appliance repair</li>
+              <li><i class="fas fa-check"></i> Seasonal checkups</li>
+              <li><i class="fas fa-check"></i> Emergency repairs</li>
+            </ul>
+            <div class="service-price">Starting from PKR 1,000</div>
+            <a href="tel:03285000617" class="btn">Book Now</a>
+          </div>
+
+          <!-- AC Service -->
+          <div class="service-card hidden">
+            <div class="service-badge">New</div>
+            <div class="service-icon"><i class="fas fa-wind"></i></div>
+            <h3>AC Services</h3>
+            <p>Professional AC installation, repair, and maintenance services for all types of air conditioners.</p>
+            <ul class="service-features">
+              <li><i class="fas fa-check"></i> AC installation</li>
+              <li><i class="fas fa-check"></i> Gas charging & repair</li>
+              <li><i class="fas fa-check"></i> Regular maintenance</li>
+              <li><i class="fas fa-check"></i> Duct cleaning</li>
+              <li><i class="fas fa-check"></i> Emergency repairs</li>
+            </ul>
+            <div class="service-price">Starting from PKR 1,500</div>
+            <a href="tel:03285000617" class="btn">Book Now</a>
+          </div>
+
+          <!-- Generator Service -->
+          <div class="service-card hidden">
+            <div class="service-icon"><i class="fas fa-generator"></i></div>
+            <h3>Generator Services</h3>
+            <p>Installation, repair, and maintenance of generators for homes and businesses.</p>
+            <ul class="service-features">
+              <li><i class="fas fa-check"></i> Generator installation</li>
+              <li><i class="fas fa-check"></i> Repair & maintenance</li>
+              <li><i class="fas fa-check"></i> Load testing</li>
+              <li><i class="fas fa-check"></i> Fuel system service</li>
+              <li><i class="fas fa-check"></i> Emergency service</li>
+            </ul>
+            <div class="service-price">Starting from PKR 2,500</div>
+            <a href="tel:03285000617" class="btn">Book Now</a>
+          </div>
+
+          <!-- Solar Service -->
+          <div class="service-card hidden">
+            <div class="service-badge">Trending</div>
+            <div class="service-icon"><i class="fas fa-solar-panel"></i></div>
+            <h3>Solar Services</h3>
+            <p>Complete solar solutions including installation, maintenance, and repair of solar systems.</p>
+            <ul class="service-features">
+              <li><i class="fas fa-check"></i> Solar panel installation</li>
+              <li><i class="fas fa-check"></i> Inverter installation</li>
+              <li><i class="fas fa-check"></i> Battery setup</li>
+              <li><i class="fas fa-check"></i> System maintenance</li>
+              <li><i class="fas fa-check"></i> Repair services</li>
+            </ul>
+            <div class="service-price">Starting from PKR 15,000</div>
+            <a href="tel:03285000617" class="btn">Book Now</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feedback Section -->
+    <section id="feedback" class="dynamic-feedback">
+      <div class="container">
+        <div class="section-title hidden">
+          <h2>Customer Feedback</h2>
+          <p>See what our satisfied customers from Pakistan have to say about our services</p>
+        </div>
+
+        <div class="feedback-slider">
+          <div class="feedback-track" id="feedbackTrack">
+            <!-- Slide 1 -->
+            <div class="feedback-slide">
+              <div class="feedback-card">
+                <div class="customer-avatar">
+                  <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Customer">
+                </div>
+                <h3 class="customer-name">Ahmed Raza</h3>
+                <p class="customer-location">Lahore, Pakistan</p>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+                <p class="customer-feedback">"Dynamic Excel fixed my plumbing issue within hours. The technician was professional and the pricing was very reasonable. Highly recommended for all plumbing work in Lahore!"</p>
+              </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="feedback-slide">
+              <div class="feedback-card">
+                <div class="customer-avatar">
+                  <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Customer">
+                </div>
+                <h3 class="customer-name">Fatima Khan</h3>
+                <p class="customer-location">Karachi, Pakistan</p>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </div>
+                <p class="customer-feedback">"We hired Dynamic Excel for complete electrical wiring of our new house in Karachi. Their team was punctual, professional and completed the work on time. Excellent service!"</p>
+              </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="feedback-slide">
+              <div class="feedback-card">
+                <div class="customer-avatar">
+                  <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Customer">
+                </div>
+                <h3 class="customer-name">Bilal Ahmed</h3>
+                <p class="customer-location">Islamabad, Pakistan</p>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+                <p class="customer-feedback">"I needed urgent WAPDA work for my new office. Dynamic Excel handled everything from application to final connection. Saved me a lot of time and hassle. Great service!"</p>
+              </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="feedback-slide">
+              <div class="feedback-card">
+                <div class="customer-avatar">
+                  <img src="https://randomuser.me/api/portraits/women/67.jpg" alt="Customer">
+                </div>
+                <h3 class="customer-name">Sana Malik</h3>
+                <p class="customer-location">Rawalpindi, Pakistan</p>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+                <p class="customer-feedback">"The painting service by Dynamic Excel transformed my house. They were careful with furniture, used quality materials, and the finish was perfect. Will definitely hire them again!"</p>
+              </div>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="feedback-slide">
+              <div class="feedback-card">
+                <div class="customer-avatar">
+                  <img src="https://randomuser.me/api/portraits/men/55.jpg" alt="Customer">
+                </div>
+                <h3 class="customer-name">Usman Ali</h3>
+                <p class="customer-location">Faisalabad, Pakistan</p>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </div>
+                <p class="customer-feedback">"Dynamic Excel installed CCTV cameras throughout my factory in Faisalabad. The installation was professional and the system works perfectly. Great value for money!"</p>
+              </div>
+            </div>
+          </div>
+
+          <button class="feedback-nav-btn feedback-prev" id="feedbackPrev">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="feedback-nav-btn feedback-next" id="feedbackNext">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+
+          <div class="feedback-nav" id="feedbackNav">
+            <!-- Dots will be added by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section id="booking" class="dynamic-booking">
+      <div class="container">
+        <div class="section-title hidden">
+          <h2>Book Your Service</h2>
+          <p>Fill out the form below and we'll contact you within 24 hours</p>
+        </div>
+
+        <div class="booking-container">
+          <div class="booking-form-container hidden">
+            <form id="booking-form">
+              <div class="form-group">
+                <label for="full-name">Full Name *</label>
+                <input type="text" id="full-name" required>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="phone">Phone Number *</label>
+                  <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                  <label for="service-type">Service Type</label>
+                  <select id="service-type">
+                    <option>Plumbing</option>
+                    <option>Electrical</option>
+                    <option>Construction</option>
+                    <option>Painting</option>
+                    <option>Carpentry</option>
+                    <option>Maintenance</option>
+                    <option>AC Services</option>
+                    <option>Generator Services</option>
+                    <option>Solar Services</option>
+                    <option>Telecommunications</option>
+                    <option>WAPDA Work</option>
+                    <option>Other Services</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="address">Address *</label>
+                <textarea id="address" required placeholder="Enter your complete address"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="description">Service Description *</label>
+                <textarea id="description" required placeholder="Describe what service you need"></textarea>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="preferred-date">Preferred Date</label>
+                  <input type="date" id="preferred-date">
+                </div>
+                <div class="form-group">
+                  <label for="preferred-time">Preferred Time</label>
+                  <select id="preferred-time">
+                    <option value="">Any Time</option>
+                    <option value="morning">Morning (9 AM - 12 PM)</option>
+                    <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
+                    <option value="evening">Evening (5 PM - 8 PM)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="urgent-request">
+                  <input type="checkbox" id="urgent">
+                  <label for="urgent">This is an urgent request (Additional charges may apply)</label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn" style="width: 100%;">Submit Booking Request</button>
+            </form>
+          </div>
+
+          <div class="booking-summary hidden">
+            <h3 style="margin-bottom: 20px;">Why Choose Us?</h3>
+            <ul class="service-features" style="color: var(--text);">
+              <li><i class="fas fa-check" style="color: var(--success);"></i> 24/7 Emergency Service</li>
+              <li><i class="fas fa-check" style="color: var(--success);"></i> Licensed & Insured Professionals</li>
+              <li><i class="fas fa-check" style="color: var(--success);"></i> Same Day Service Available</li>
+              <li><i class="fas fa-check" style="color: var(--success);"></i> 100% Satisfaction Guaranteed</li>
+              <li><i class="fas fa-check" style="color: var(--success);"></i> Free Estimates</li>
+              <li><i class="fas fa-check" style="color: var(--success);"></i> Affordable Pricing</li>
+            </ul>
+            
+            <div style="background: var(--light); padding: 20px; border-radius: 8px; margin-top: 20px;">
+              <h4 style="margin-bottom: 10px;">Emergency Contact</h4>
+              <p style="margin-bottom: 10px;">Available 24/7 for urgent repairs</p>
+              <a href="tel:03285000617" class="btn" style="width: 100%;">📞 Call Now: 0328-5000617</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="dynamic-footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-column">
+            <h3>Dynamic Excel</h3>
+            <p>Your trusted partner for all service needs. Quality, reliability, and professionalism guaranteed with years of experience serving the community.</p>
+            <div class="emergency-widget">
+              <div class="emergency-icon">🚨</div>
+              <div class="emergency-text">24/7 Emergency Services</div>
+              <a href="tel:03285000617" class="btn" style="width: 100%;">Call Now: 0328-5000617</a>
+            </div>
+          </div>
+
+          <div class="footer-column">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#services">Services</a></li>
+              <li><a href="#feedback">Feedback</a></li>
+              <li><a href="#booking">Book Service</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h3>Our Services</h3>
+            <ul>
+              <li><a href="#services">Plumbing</a></li>
+              <li><a href="#services">Electrical</a></li>
+              <li><a href="#services">Construction</a></li>
+              <li><a href="#services">Painting</a></li>
+              <li><a href="#services">AC Services</a></li>
+              <li><a href="#services">Solar Services</a></li>
+              <li><a href="#services">WAPDA Work</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h3>Contact Us</h3>
+            <ul class="contact-info">
+              <li><i class="fas fa-map-marker-alt"></i> <span>Wah Cantt, Pakistan</span></li>
+              <li><i class="fas fa-phone"></i> <span>0328-5000617</span></li>
+              <li><i class="fas fa-envelope"></i> <span>dynamicexcel96@gmail.com</span></li>
+              <li><i class="fas fa-clock"></i> <span>24/7 Available</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="copyright">
+          <p>&copy; 2023 Dynamic Excel (SMC-Pvt.) Limited. All rights reserved. | Professional Services Provider</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Chat Bot -->
+  <div class="chat-bot" id="chatBot">
+    <i class="fas fa-comments"></i>
+  </div>
+
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <h3>Dynamic Excel Support</h3>
+      <button class="chat-close" id="chatClose">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="message bot-message">
+        Hello! How can I help you today?
+      </div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Type your message...">
+      <button id="chatSend">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script>
+    // Loading Animation
+    document.addEventListener('DOMContentLoaded', function() {
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const loadingProgress = document.getElementById('loadingProgress');
+      const loadingServices = document.getElementById('loadingServices');
+      
+      // Service tags for loading animation
+      const services = [
+        'Plumbing Services', 'Electrical Work', 'Construction', 'Painting',
+        'Carpentry', 'Maintenance', 'AC Services', 'Generator Services',
+        'Solar Services', 'Telecommunications', 'WAPDA Work', 'Renovation'
+      ];
+      
+      // Add service tags to loading screen
+      services.forEach(service => {
+        const tag = document.createElement('div');
+        tag.className = 'service-tag';
+        tag.textContent = service;
+        loadingServices.appendChild(tag);
+      });
+      
+      // Simulate loading progress
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 10;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          
+          // Animate service tags
+          const serviceTags = document.querySelectorAll('.service-tag');
+          serviceTags.forEach((tag, index) => {
+            setTimeout(() => {
+              tag.style.opacity = '1';
+              tag.style.transform = 'translateY(0)';
+            }, index * 100);
+          });
+          
+          // Hide loading overlay after animation
+          setTimeout(() => {
+            loadingOverlay.classList.add('hidden');
+          }, 1500);
+        }
+        loadingProgress.style.width = `${progress}%`;
+      }, 200);
+      
+      // Mobile Menu Toggle
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const navLinks = document.getElementById('navLinks');
+      
+      mobileMenuBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+      });
+      
+      // Close mobile menu when clicking on a link
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('active');
+        });
+      });
+      
+      // Scroll Animation
+      const elementsToAnimate = document.querySelectorAll('.hidden');
+      
+      // Progress bar
+      const progressBar = document.getElementById('progressBar');
+      
+      // Intersection Observer for scroll animations
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            
+            // Add random animation delay for staggered effect
+            const randomDelay = Math.random() * 0.5;
+            entry.target.style.transitionDelay = `${randomDelay}s`;
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      });
+      
+      // Observe all elements
+      elementsToAnimate.forEach(element => {
+        observer.observe(element);
+      });
+      
+      // Progress bar update on scroll
+      window.addEventListener('scroll', () => {
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight - windowHeight;
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const progress = (scrollTop / documentHeight) * 100;
+        progressBar.style.width = `${progress}%`;
+        
+        // Show/hide back to top button
+        const backToTop = document.getElementById('backToTop');
+        if (scrollTop > 500) {
+          backToTop.classList.add('visible');
+        } else {
+          backToTop.classList.remove('visible');
+        }
+      });
+      
+      // Back to top functionality
+      document.getElementById('backToTop').addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+      
+      // Form Submission
+      document.getElementById('booking-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Thank you! We will contact you within 24 hours.');
+        this.reset();
+      });
+      
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+      
+      // Add hover effect to service cards
+      const serviceCards = document.querySelectorAll('.service-card');
+      serviceCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          card.style.transform = 'translateY(-15px) rotateY(5deg)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'translateY(0) rotateY(0)';
+        });
+      });
+      
+      // Feedback Slider
+      const feedbackTrack = document.getElementById('feedbackTrack');
+      const feedbackSlides = document.querySelectorAll('.feedback-slide');
+      const feedbackPrev = document.getElementById('feedbackPrev');
+      const feedbackNext = document.getElementById('feedbackNext');
+      const feedbackNav = document.getElementById('feedbackNav');
+      
+      let currentSlide = 0;
+      
+      // Create navigation dots
+      feedbackSlides.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.className = 'feedback-dot';
+        if (index === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => {
+          goToSlide(index);
+        });
+        feedbackNav.appendChild(dot);
+      });
+      
+      // Function to go to specific slide
+      function goToSlide(slideIndex) {
+        feedbackTrack.style.transform = `translateX(-${slideIndex * 100}%)`;
+        currentSlide = slideIndex;
+        
+        // Update active dot
+        document.querySelectorAll('.feedback-dot').forEach((dot, index) => {
+          if (index === slideIndex) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+      
+      // Next slide
+      feedbackNext.addEventListener('click', () => {
+        currentSlide = (currentSlide + 1) % feedbackSlides.length;
+        goToSlide(currentSlide);
+      });
+      
+      // Previous slide
+      feedbackPrev.addEventListener('click', () => {
+        currentSlide = (currentSlide - 1 + feedbackSlides.length) % feedbackSlides.length;
+        goToSlide(currentSlide);
+      });
+      
+      // Auto slide every 5 seconds
+      setInterval(() => {
+        currentSlide = (currentSlide + 1) % feedbackSlides.length;
+        goToSlide(currentSlide);
+      }, 5000);
+      
+      // Chat Bot Functionality
+      const chatBot = document.getElementById('chatBot');
+      const chatWindow = document.getElementById('chatWindow');
+      const chatClose = document.getElementById('chatClose');
+      const chatMessages = document.getElementById('chatMessages');
+      const chatInput = document.getElementById('chatInput');
+      const chatSend = document.getElementById('chatSend');
+      
+      chatBot.addEventListener('click', () => {
+        chatWindow.style.display = 'flex';
+      });
+      
+      chatClose.addEventListener('click', () => {
+        chatWindow.style.display = 'none';
+      });
+      
+      function addMessage(text, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+        messageDiv.textContent = text;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+      
+      function handleUserMessage() {
+        const message = chatInput.value.trim();
+        if (message) {
+          addMessage(message, true);
+          chatInput.value = '';
+          
+          // Simulate bot response
+          setTimeout(() => {
+            const responses = [
+              "Thanks for your message! How can I assist you with our services?",
+              "I understand. One of our representatives will contact you shortly.",
+              "Would you like to book a service or get a quote?",
+              "We offer a wide range of services. Which one are you interested in?",
+              "I can help you schedule a service appointment. What service do you need?"
+            ];
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            addMessage(randomResponse);
+          }, 1000);
+        }
+      }
+      
+      chatSend.addEventListener('click', handleUserMessage);
+      
+      chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          handleUserMessage();
+        }
+      });
+    });
+  </script>
+
+  <!-- Shopify Required -->
+  {{ content_for_body }}
+</body>
+</html>
